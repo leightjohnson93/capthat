@@ -1,8 +1,21 @@
 import React, { Component } from "react";
+import firebase from "firebase";
 import logo from "../logo.svg";
 import "../css/App.css";
 
 class App extends Component {
+  // constructor(props) {
+  //   super(props);
+  //   this.state = {
+  //     userId: props.match.params.userId
+  //   };
+  // }
+
+  // componentWillMount() {
+  //   const userRef = firebase.database().ref("user");
+  //   userRef.push(this.state.userId);
+  // }
+
   render() {
     return (
       <div className="App">

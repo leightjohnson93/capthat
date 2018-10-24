@@ -1,5 +1,6 @@
 import React, { Component } from "react";
-import firebase from "firebase";
+import firebase from "firebase/app";
+import "firebase/auth";
 import base, { firebaseApp } from "../base";
 
 class Login extends Component {
@@ -30,8 +31,17 @@ class Login extends Component {
   // };
 
   authHandler = async authData => {
-    const user = authData.user.uid;
-    this.props.history.push(`/user/${user}`);
+    const { uid, displayName } = authData.user;
+    const users = await base.fetch("users", { context: this });
+    for (const user in users) {
+      if (users[user].uid === uid) {
+        this.props.history.push(`/user/${uid}`);
+        return authData;
+      }
+      const userRef = firebase.database().ref("users");
+      userRef.push({ uid, displayName });
+      this.props.history.push(`/user/${uid}`);
+    }
   };
 
   authenticate = provider => {
@@ -41,7 +51,6 @@ class Login extends Component {
       .signInWithPopup(authProvider)
       .then(this.authHandler);
   };
-
   render() {
     return (
       <nav className="login">
