@@ -39,11 +39,20 @@ class Profile extends Component {
     this.props.history.push(`/`);
   };
 
+  updateProfile = updatedProfile => {
+    this.setState({ [this.uid]: updatedProfile });
+  };
+
   render() {
     if (!Object.keys(this.state).length) {
       return <Login authenticate={this.authenticate} />;
     } else if (!this.state[this.uid].handle) {
-      return <EditProfile />;
+      return (
+        <EditProfile
+          user={this.state[this.uid]}
+          updateProfile={this.updateProfile}
+        />
+      );
     }
     return (
       <div className="App">
