@@ -2,6 +2,7 @@ import React, { Component } from "react";
 import Login from "./Login";
 import EditProfile from "./EditProfile";
 import firebase from "firebase/app";
+import axios from "axios";
 import base, { firebaseApp } from "../base";
 import "../css/App.css";
 
@@ -44,6 +45,29 @@ class Profile extends Component {
 
   handleEdit = () => this.setState({ editProfile: true });
 
+  fetchInstagram = async handle => {
+    const userInfoSource = await axios.get(
+      `https://www.instagram.com/${handle}/`
+    );
+    const jsonObject = userInfoSource.data
+      .match(
+        /<script type="text\/javascript">window\._sharedData = (.*)<\/script>/
+      )[1]
+      .slice(0, -1);
+    const profPic = JSON.parse(jsonObject).entry_data.ProfilePage[0].graphql
+      .user.profile_pic_url_hd;
+    const uid = { ...this.state[this.uid] };
+    uid.profPic = profPic;
+    console.log(uid);
+    this.setState({ [this.uid]: uid });
+  };
+
+  componentWillUpdate() {
+    const uid = this.state[this.uid];
+    console.log(uid);
+    if (uid && uid.handle) this.fetchInstagram(uid.handle);
+  }
+
   render() {
     if (!this.state[this.uid]) {
       return <Login authenticate={this.authenticate} />;
@@ -53,6 +77,7 @@ class Profile extends Component {
       <div className="App">
         <header className="App-header">
           <p>{this.state[this.uid].handle}</p>
+          <img src={this.state[this.uid].profPic} alt="Profile" />
           <button onClick={this.logout}>Logout</button>
           {this.state.editProfile || !this.state[this.uid].handle ? (
             <EditProfile
