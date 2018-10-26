@@ -3,11 +3,10 @@ import Login from "./Login";
 import EditProfile from "./EditProfile";
 import firebase from "firebase/app";
 import base, { firebaseApp } from "../base";
-import logo from "../logo.svg";
 import "../css/App.css";
 
 class Profile extends Component {
-  state = {};
+  state = { editProfile: false };
 
   authHandler = async authData => {
     const { uid, displayName, email } = authData.user;
@@ -40,26 +39,29 @@ class Profile extends Component {
   };
 
   updateProfile = updatedProfile => {
-    this.setState({ [this.uid]: updatedProfile });
+    this.setState({ [this.uid]: updatedProfile, editProfile: false });
   };
 
+  handleEdit = () => this.setState({ editProfile: true });
+
   render() {
-    if (!Object.keys(this.state).length) {
+    if (!this.state[this.uid]) {
       return <Login authenticate={this.authenticate} />;
-    } else if (!this.state[this.uid].handle) {
-      return (
-        <EditProfile
-          user={this.state[this.uid]}
-          updateProfile={this.updateProfile}
-        />
-      );
     }
+
     return (
       <div className="App">
         <header className="App-header">
-          <img src={logo} className="App-logo" alt="logo" />
-          <p>Welcome to CapThat</p>
+          <p>{this.state[this.uid].handle}</p>
           <button onClick={this.logout}>Logout</button>
+          {this.state.editProfile || !this.state[this.uid].handle ? (
+            <EditProfile
+              user={this.state[this.uid]}
+              updateProfile={this.updateProfile}
+            />
+          ) : (
+            <button onClick={this.handleEdit}>Edit Profile</button>
+          )}
         </header>
       </div>
     );

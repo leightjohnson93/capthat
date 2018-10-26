@@ -1,4 +1,5 @@
 import React, { Component } from "react";
+import "../css/EditProfile.css";
 
 class EditProfile extends Component {
   handleChange = event => {
@@ -9,17 +10,22 @@ class EditProfile extends Component {
     this.setState({ ...updatedProfile });
   };
 
-  handleClick = event => {
+  handleSave = event => {
     event.preventDefault();
     this.props.updateProfile({ ...this.state });
   };
 
   render() {
     return (
-      <form>
+      <form className="EditProfile">
         <label>
           Handle:
-          <input type="text" name="handle" onChange={this.handleChange} />
+          <input
+            type="text"
+            name="handle"
+            defaultValue={this.props.user.handle}
+            onChange={this.handleChange}
+          />
         </label>
         <label>
           Name:
@@ -39,9 +45,7 @@ class EditProfile extends Component {
             onChange={this.handleChange}
           />
         </label>
-        <button value="Save" onClick={this.handleClick}>
-          Save
-        </button>
+        <button onClick={this.handleSave}>Save</button>
       </form>
     );
   }
