@@ -11,7 +11,7 @@ class Profile extends Component {
 
   authHandler = async authData => {
     const { uid, displayName, email, photoURL } = authData.user;
-    this.uid = authData.user.uid;
+    this.uid = uid;
     const users = await base.fetch("users", { context: this });
     if (!users[uid]) {
       const userRef = firebase.database().ref("users");
@@ -22,7 +22,6 @@ class Profile extends Component {
       context: this,
       state: uid
     });
-    console.log(authData);
   };
 
   authenticate = provider => {
@@ -85,6 +84,7 @@ class Profile extends Component {
           ) : (
             <button onClick={this.handleEdit}>Edit Profile</button>
           )}
+          <input type="file" />
         </header>
       </div>
     );
