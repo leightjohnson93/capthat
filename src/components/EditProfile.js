@@ -1,5 +1,4 @@
 import React, { Component } from "react";
-import "../css/EditProfile.css";
 
 class EditProfile extends Component {
   handleChange = event => {

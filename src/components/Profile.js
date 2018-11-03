@@ -1,13 +1,16 @@
-import React, { Component } from "react";
+import React, { Component, Fragment } from "react";
 import Login from "./Login";
+import UserPhotos from "./UserPhotos";
 import EditProfile from "./EditProfile";
 import firebase from "firebase/app";
-// import axios from "axios";
 import base, { firebaseApp } from "../base";
-import "../css/App.css";
+import "../css/Profile.css";
 
 class Profile extends Component {
-  state = { editProfile: false };
+  state = {
+    senderEditProfile: false,
+    renderUserPhotos: false
+  };
 
   authHandler = async authData => {
     const { uid, displayName, email, photoURL } = authData.user;
@@ -17,7 +20,7 @@ class Profile extends Component {
       const userRef = firebase.database().ref("users");
       userRef.set({ [uid]: { uid, displayName, email, photoURL } });
     }
-    this.props.history.push(`/user/${uid}`);
+    this.props.history.push(`/user/`);
     base.syncState(`users/${uid}`, {
       context: this,
       state: uid
@@ -40,51 +43,62 @@ class Profile extends Component {
   };
 
   updateProfile = updatedProfile =>
-    this.setState({ [this.uid]: updatedProfile, editProfile: false });
+    this.setState({ [this.uid]: updatedProfile, renderEditProfile: false });
 
-  handleEdit = () => this.setState({ editProfile: true });
+  handleEdit = () => this.setState({ renderEditProfile: true });
 
-  // fetchInstagram = async handle => {
-  //   const userInfoSource = await axios.get(
-  //     `https://www.instagram.com/${handle}/`
-  //   );
-  //   const jsonObject = userInfoSource.data
-  //     .match(
-  //       /<script type="text\/javascript">window\._sharedData = (.*)<\/script>/
-  //     )[1]
-  //     .slice(0, -1);
-  //   const profPic = JSON.parse(jsonObject).entry_data.ProfilePage[0].graphql
-  //     .user.profile_pic_url_hd;
-  //   const uid = { ...this.state[this.uid] };
-  //   uid.profPic = profPic;
-  //   this.setState({ [this.uid]: uid });
-  // };
+  handlePhotos = () => this.setState({ renderUserPhotos: true });
 
-  // componentWillUpdate() {
-  //   const uid = this.state[this.uid];
-  //   if (uid && uid.handle) this.fetchInstagram(uid.handle);
-  // }
+  addPhoto = userPhotos => {
+    const newState = { ...this.state };
+    newState[this.uid].photos = userPhotos;
+    this.setState(newState);
+  };
+
+  removePhoto = key => {
+    firebase
+      .storage()
+      .ref(`users/${this.uid}/${key}`)
+      .delete()
+      .then();
+    const photos = { ...this.state[this.uid].photos };
+    photos[key] = null;
+    const newState = { ...this.state };
+    newState[this.uid].photos = photos;
+    this.setState(newState);
+  };
 
   render() {
     if (!this.state[this.uid]) {
       return <Login authenticate={this.authenticate} />;
     }
 
+    if (this.state.renderUserPhotos) {
+      return (
+        <UserPhotos
+          user={this.state[this.uid]}
+          addPhoto={this.addPhoto}
+          removePhoto={this.removePhoto}
+        />
+      );
+    }
     return (
       <div className="App">
         <header className="App-header">
           <p>{this.state[this.uid].handle}</p>
           <img src={this.state[this.uid].photoURL} alt="Profile" />
           <button onClick={this.logout}>Logout</button>
-          {this.state.editProfile || !this.state[this.uid].handle ? (
+          {this.state.renderEditProfile || !this.state[this.uid].handle ? (
             <EditProfile
               user={this.state[this.uid]}
               updateProfile={this.updateProfile}
             />
           ) : (
-            <button onClick={this.handleEdit}>Edit Profile</button>
+            <Fragment>
+              <button onClick={this.handleEdit}>Edit Profile</button>
+              <button onClick={this.handlePhotos}>My Photos</button>
+            </Fragment>
           )}
-          <input type="file" />
         </header>
       </div>
     );
