@@ -8,7 +8,6 @@ import "../css/Profile.css";
 
 class Profile extends Component {
   state = {
-    senderEditProfile: false,
     renderUserPhotos: false
   };
 
@@ -45,9 +44,15 @@ class Profile extends Component {
   updateProfile = updatedProfile =>
     this.setState({ [this.uid]: updatedProfile, renderEditProfile: false });
 
-  handleEdit = () => this.setState({ renderEditProfile: true });
+  handleEdit = () =>
+    this.setState(prevState => ({
+      renderEditProfile: !prevState.renderEditProfile
+    }));
 
-  handlePhotos = () => this.setState({ renderUserPhotos: true });
+  handlePhotos = () =>
+    this.setState(prevState => ({
+      renderUserPhotos: !prevState.renderUserPhotos
+    }));
 
   addPhoto = userPhotos => {
     const newState = { ...this.state };
@@ -61,10 +66,8 @@ class Profile extends Component {
       .ref(`users/${this.uid}/${key}`)
       .delete()
       .then();
-    const photos = { ...this.state[this.uid].photos };
-    photos[key] = null;
     const newState = { ...this.state };
-    newState[this.uid].photos = photos;
+    newState[this.uid].photos[key] = null;
     this.setState(newState);
   };
 
@@ -79,6 +82,7 @@ class Profile extends Component {
           user={this.state[this.uid]}
           addPhoto={this.addPhoto}
           removePhoto={this.removePhoto}
+          handlePhotos={this.handlePhotos}
         />
       );
     }

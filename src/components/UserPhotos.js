@@ -28,6 +28,7 @@ class UserPhotos extends Component {
   render() {
     return (
       <div className="App App-header">
+        <button onClick={this.props.handlePhotos}>Back</button>
         <input type="file" onChange={this.handleFileSelect} />
         <button
           onClick={this.handleUpload}
