@@ -3,8 +3,9 @@ import firebase from "firebase/app";
 import "firebase/storage";
 
 class UserPhotos extends Component {
+  state = { progress: "" };
   handleFileSelect = event => {
-    this.setState({ selectedFile: event.target.files[0] });
+    this.setState({ selectedFile: event.target.files[0], progress: "" });
   };
   handleUpload = () => {
     const key = Date.now();
@@ -12,15 +13,22 @@ class UserPhotos extends Component {
       .storage()
       .ref(`users/${this.props.user.uid}/${key}`)
       .put(this.state.selectedFile);
-    delete this.state.selectedFile;
+    const newState = { ...this.state };
+    newState.selectedFile = null;
+    this.setState(newState);
     uploadTask.on(
       "state_changed",
-      () => {},
+      snapshot => {
+        let progress = `(${Math.round(
+          (snapshot.bytesTransferred / snapshot.totalBytes) * 100
+        )}%)`;
+        this.setState({ progress });
+      },
       error => console.log(`Error: ${error}`),
       () =>
         uploadTask.snapshot.ref.getDownloadURL().then(downloadURL => {
-          this.setState({ [key]: downloadURL });
-          this.props.addPhoto(this.state);
+          this.setState({ progress: "" });
+          this.props.addPhoto({ [key]: downloadURL });
         })
     );
   };
@@ -29,12 +37,16 @@ class UserPhotos extends Component {
     return (
       <div className="App App-header">
         <button onClick={this.props.handlePhotos}>Back</button>
-        <input type="file" onChange={this.handleFileSelect} />
+        <input
+          type="file"
+          onChange={this.handleFileSelect}
+          disabled={this.state.progress !== ""}
+        />
         <button
           onClick={this.handleUpload}
           disabled={!this.state || !this.state.selectedFile}
         >
-          Upload
+          Upload {this.state.progress}
         </button>
         <div className="user-photos">
           {this.props.user.photos ? (

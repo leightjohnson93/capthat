@@ -51,9 +51,9 @@ class Profile extends Component {
       renderUserPhotos: !prevState.renderUserPhotos
     }));
 
-  addPhoto = userPhotos => {
+  addPhoto = photo => {
     const newState = { ...this.state };
-    newState[this.uid].photos = userPhotos;
+    newState[this.uid].photos = photo;
     this.setState(newState);
   };
 
