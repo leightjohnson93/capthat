@@ -25,6 +25,10 @@ form {
 }
 
 .user-photos img {
+  width: 100%;
   max-width: 400px;
-  padding: 20px;
+}
+
+.user-photos button {
+  display: block;
 }

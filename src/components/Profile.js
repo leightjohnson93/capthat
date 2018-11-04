@@ -7,10 +7,6 @@ import base, { firebaseApp } from "../base";
 import "../css/Profile.css";
 
 class Profile extends Component {
-  state = {
-    renderUserPhotos: false
-  };
-
   authHandler = async authData => {
     const { uid, displayName, email, photoURL } = authData.user;
     this.uid = uid;
@@ -27,6 +23,7 @@ class Profile extends Component {
   };
 
   authenticate = provider => {
+    firebase.auth().setPersistence(firebase.auth.Auth.Persistence.LOCAL);
     const authProvider = new firebase.auth[`${provider}AuthProvider`]();
     firebaseApp
       .auth()
@@ -71,8 +68,14 @@ class Profile extends Component {
     this.setState(newState);
   };
 
+  componentDidMount() {
+    firebase.auth().onAuthStateChanged(user => {
+      if (user) this.authHandler({ user });
+    });
+  }
+
   render() {
-    if (!this.state[this.uid]) {
+    if (!this.state || !this.state[this.uid]) {
       return <Login authenticate={this.authenticate} />;
     }
 
