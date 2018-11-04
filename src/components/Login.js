@@ -14,6 +14,9 @@ const Login = props => (
     <button className="facebook" onClick={() => props.authenticate("Facebook")}>
       Log In With Facebook
     </button>
+    <a href="https://www.freeprivacypolicy.com/privacy/view/f99a94fbeb02fc46134d1e819ed53a22">
+      Privacy Policy
+    </a>
   </nav>
 );
 
