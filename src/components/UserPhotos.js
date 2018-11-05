@@ -1,4 +1,5 @@
 import React, { Component } from "react";
+import Photo from "./Photo";
 import firebase from "firebase/app";
 import "firebase/storage";
 
@@ -51,12 +52,12 @@ class UserPhotos extends Component {
         <div className="user-photos">
           {this.props.user.photos ? (
             Object.keys(this.props.user.photos).map(key => (
-              <div className="photo" key={this.props.user.photos[key]}>
-                <img src={this.props.user.photos[key]} alt="user uploaded" />
-                <button onClick={() => this.props.removePhoto(key)}>
-                  &times;
-                </button>
-              </div>
+              <Photo
+                key={key}
+                photoKey={key}
+                url={this.props.user.photos[key]}
+                removePhoto={this.props.removePhoto}
+              />
             ))
           ) : (
             <h2>Upload photos you want captioned!</h2>

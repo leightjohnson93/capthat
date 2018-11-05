@@ -42,13 +42,13 @@ class Profile extends Component {
     this.setState({ [this.uid]: updatedProfile, renderEditProfile: false });
 
   handleEdit = () =>
-    this.setState(prevState => ({
-      renderEditProfile: !prevState.renderEditProfile
+    this.setState(state => ({
+      renderEditProfile: !state.renderEditProfile
     }));
 
   handlePhotos = () =>
-    this.setState(prevState => ({
-      renderUserPhotos: !prevState.renderUserPhotos
+    this.setState(state => ({
+      renderUserPhotos: !state.renderUserPhotos
     }));
 
   addPhoto = photo => {
@@ -62,10 +62,11 @@ class Profile extends Component {
       .storage()
       .ref(`users/${this.uid}/${key}`)
       .delete()
-      .then();
-    const newState = { ...this.state };
-    newState[this.uid].photos[key] = null;
-    this.setState(newState);
+      .then(() => {
+        const state = { ...this.state };
+        state[this.uid].photos[key] = null;
+        this.setState(state);
+      });
   };
 
   componentDidMount() {
