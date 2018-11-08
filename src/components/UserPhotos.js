@@ -4,7 +4,10 @@ import firebase from "firebase/app";
 import "firebase/storage";
 
 class UserPhotos extends Component {
-  state = { progress: "" };
+  constructor() {
+    super();
+    this.state = { progress: "" };
+  }
   handleFileSelect = event => {
     this.setState({ selectedFile: event.target.files[0], progress: "" });
   };
@@ -37,7 +40,9 @@ class UserPhotos extends Component {
   render() {
     return (
       <div className="App App-header">
-        <button onClick={this.props.handlePhotos}>Back</button>
+        <button name="showPhotos" onClick={this.props.unMount}>
+          Back
+        </button>
         <input
           type="file"
           onChange={this.handleFileSelect}

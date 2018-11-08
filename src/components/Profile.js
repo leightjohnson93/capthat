@@ -7,6 +7,10 @@ import base, { firebaseApp } from "../base";
 import "../css/Profile.css";
 
 class Profile extends Component {
+  constructor() {
+    super();
+    this.state = {};
+  }
   authHandler = async authData => {
     const { uid, displayName, email, photoURL } = authData.user;
     this.uid = uid;
@@ -15,7 +19,7 @@ class Profile extends Component {
       const userRef = firebase.database().ref("users");
       userRef.set({ [uid]: { uid, displayName, email, photoURL } });
     }
-    this.props.history.push(`/user/`);
+    this.props.history.push(`/profile/`);
     base.syncState(`users/${uid}`, {
       context: this,
       state: uid
@@ -39,17 +43,12 @@ class Profile extends Component {
   };
 
   updateProfile = updatedProfile =>
-    this.setState({ [this.uid]: updatedProfile, renderEditProfile: false });
+    this.setState({ [this.uid]: updatedProfile, editProfile: false });
 
-  handleEdit = () =>
-    this.setState(state => ({
-      renderEditProfile: !state.renderEditProfile
-    }));
-
-  handlePhotos = () =>
-    this.setState(state => ({
-      renderUserPhotos: !state.renderUserPhotos
-    }));
+  toggleView = event => {
+    const { name } = event.target;
+    this.setState(prevState => ({ [name]: !prevState[name] }));
+  };
 
   addPhoto = photo => {
     const newState = { ...this.state };
@@ -80,13 +79,13 @@ class Profile extends Component {
       return <Login authenticate={this.authenticate} />;
     }
 
-    if (this.state.renderUserPhotos) {
+    if (this.state.showPhotos) {
       return (
         <UserPhotos
           user={this.state[this.uid]}
           addPhoto={this.addPhoto}
           removePhoto={this.removePhoto}
-          handlePhotos={this.handlePhotos}
+          unMount={this.toggleView}
         />
       );
     }
@@ -96,15 +95,19 @@ class Profile extends Component {
           <p>{this.state[this.uid].handle}</p>
           <img src={this.state[this.uid].photoURL} alt="Profile" />
           <button onClick={this.logout}>Logout</button>
-          {this.state.renderEditProfile || !this.state[this.uid].handle ? (
+          {this.state.editProfile || !this.state[this.uid].handle ? (
             <EditProfile
               user={this.state[this.uid]}
               updateProfile={this.updateProfile}
             />
           ) : (
             <Fragment>
-              <button onClick={this.handleEdit}>Edit Profile</button>
-              <button onClick={this.handlePhotos}>My Photos</button>
+              <button name="editProfile" onClick={this.toggleView}>
+                Edit Profile
+              </button>
+              <button name="showPhotos" onClick={this.toggleView}>
+                My Photos
+              </button>
             </Fragment>
           )}
         </header>
