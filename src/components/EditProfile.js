@@ -1,17 +1,29 @@
 import React, { Component } from "react";
 
 class EditProfile extends Component {
-  handleChange = event => {
-    const updatedProfile = {
-      ...this.props.user,
-      [event.currentTarget.name]: event.currentTarget.value
-    };
-    this.setState({ ...updatedProfile });
-  };
+  constructor(props) {
+    super(props);
+    this.state = {};
+    const { handle, email, displayName } = this.props[this.props.uid];
+    Object.assign(this, { handle, email, displayName });
+  }
+
+  componentDidMount() {
+    this.setState({
+      handle: this.handle,
+      email: this.email,
+      displayName: this.displayName
+    });
+  }
+
+  handleChange = event =>
+    this.setState({ [event.currentTarget.name]: event.currentTarget.value });
 
   handleSave = event => {
     event.preventDefault();
-    this.props.updateProfile({ ...this.state });
+    const { handle, email, displayName } = this.state;
+    this.props.updateProfile({ handle, email, displayName });
+    this.props.toggleView(event);
   };
 
   render() {
@@ -22,7 +34,7 @@ class EditProfile extends Component {
           <input
             type="text"
             name="handle"
-            defaultValue={this.props.user.handle}
+            defaultValue={this.handle}
             onChange={this.handleChange}
           />
         </label>
@@ -31,7 +43,7 @@ class EditProfile extends Component {
           <input
             type="text"
             name="displayName"
-            defaultValue={this.props.user.displayName}
+            defaultValue={this.displayName}
             onChange={this.handleChange}
           />
         </label>
@@ -40,11 +52,19 @@ class EditProfile extends Component {
           <input
             type="text"
             name="email"
-            defaultValue={this.props.user.email}
+            defaultValue={this.email}
             onChange={this.handleChange}
           />
         </label>
-        <button onClick={this.handleSave}>Save</button>
+        <button
+          name="editProfile"
+          onClick={this.handleSave}
+          disabled={
+            !(this.state.handle && this.state.email && this.state.displayName)
+          }
+        >
+          Save
+        </button>
       </form>
     );
   }

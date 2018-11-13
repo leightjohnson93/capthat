@@ -1,4 +1,5 @@
 import React, { Component, Fragment } from "react";
+import { Link } from "react-router-dom";
 import Login from "./Login";
 import UserPhotos from "./UserPhotos";
 import EditProfile from "./EditProfile";
@@ -7,84 +8,24 @@ import base, { firebaseApp } from "../base";
 import "../css/Profile.css";
 
 class Profile extends Component {
-  constructor() {
-    super();
-    this.state = {};
+  constructor(props) {
+    super(props);
+    this.uid = this.props.uid;
+    this.state = { editProfile: this.props.editPhoto };
   }
-  authHandler = async authData => {
-    const { uid, displayName, email, photoURL } = authData.user;
-    this.uid = uid;
-    const users = await base.fetch("users", { context: this });
-    if (!users[uid]) {
-      const userRef = firebase.database().ref("users");
-      userRef.set({ [uid]: { uid, displayName, email, photoURL } });
-    }
-    this.props.history.push(`/profile/`);
-    base.syncState(`users/${uid}`, {
-      context: this,
-      state: uid
-    });
-  };
-
-  authenticate = provider => {
-    firebase.auth().setPersistence(firebase.auth.Auth.Persistence.LOCAL);
-    const authProvider = new firebase.auth[`${provider}AuthProvider`]();
-    firebaseApp
-      .auth()
-      .signInWithPopup(authProvider)
-      .then(this.authHandler);
-  };
-
-  logout = async () => {
-    await firebase.auth().signOut();
-    delete this.state[this.uid];
-    this.setState(this.state);
-    this.props.history.push(`/`);
-  };
-
-  updateProfile = updatedProfile =>
-    this.setState({ [this.uid]: updatedProfile, editProfile: false });
 
   toggleView = event => {
     const { name } = event.target;
     this.setState(prevState => ({ [name]: !prevState[name] }));
   };
 
-  addPhoto = photo => {
-    const newState = { ...this.state };
-    newState[this.uid].photos = photo;
-    this.setState(newState);
-  };
-
-  removePhoto = key => {
-    firebase
-      .storage()
-      .ref(`users/${this.uid}/${key}`)
-      .delete()
-      .then(() => {
-        const state = { ...this.state };
-        state[this.uid].photos[key] = null;
-        this.setState(state);
-      });
-  };
-
-  componentDidMount() {
-    firebase.auth().onAuthStateChanged(user => {
-      if (user) this.authHandler({ user });
-    });
-  }
-
   render() {
-    if (!this.state || !this.state[this.uid]) {
-      return <Login authenticate={this.authenticate} />;
-    }
-
     if (this.state.showPhotos) {
       return (
         <UserPhotos
-          user={this.state[this.uid]}
-          addPhoto={this.addPhoto}
-          removePhoto={this.removePhoto}
+          {...this.props}
+          // addPhoto={this.addPhoto}
+          // removePhoto={this.removePhoto}
           unMount={this.toggleView}
         />
       );
@@ -92,14 +33,15 @@ class Profile extends Component {
     return (
       <div className="App">
         <header className="App-header">
-          <p>{this.state[this.uid].handle}</p>
-          <img src={this.state[this.uid].photoURL} alt="Profile" />
-          <button onClick={this.logout}>Logout</button>
-          {this.state.editProfile || !this.state[this.uid].handle ? (
-            <EditProfile
-              user={this.state[this.uid]}
-              updateProfile={this.updateProfile}
-            />
+          <p>{[this.uid].handle}</p>
+          <img src={this.props[this.uid].photoURL} alt="Profile" />
+          <button>
+            <Link to="/" onClick={this.props.logout}>
+              Logout
+            </Link>
+          </button>
+          {this.state.editProfile || !this.props.uid ? (
+            <EditProfile {...this.props} toggleView={this.toggleView} />
           ) : (
             <Fragment>
               <button name="editProfile" onClick={this.toggleView}>
