@@ -9,6 +9,7 @@ class UserPhotos extends Component {
     this.uid = this.props[this.props.uid];
     this.state = { progress: "" };
   }
+
   handleFileSelect = event => {
     this.setState({ selectedFile: event.target.files[0], progress: "" });
   };
@@ -16,7 +17,7 @@ class UserPhotos extends Component {
     const key = Date.now();
     const uploadTask = firebase
       .storage()
-      .ref(`users/${[this.props.uid]}/${key}`)
+      .ref(`users/${this.props.uid}/${key}`)
       .put(this.state.selectedFile);
     const newState = { ...this.state };
     newState.selectedFile = null;
@@ -56,12 +57,12 @@ class UserPhotos extends Component {
           Upload {this.state.progress}
         </button>
         <div className="user-photos">
-          {this.uid.photos ? (
-            Object.keys(this.uid.photos).map(key => (
+          {this.props[this.props.uid].photos ? (
+            Object.keys(this.props[this.props.uid].photos).map(key => (
               <Photo
                 key={key}
                 photoKey={key}
-                url={this.uid.photos[key]}
+                url={this.props[this.props.uid].photos[key]}
                 removePhoto={this.props.removePhoto}
               />
             ))

@@ -21,14 +21,7 @@ class Profile extends Component {
 
   render() {
     if (this.state.showPhotos) {
-      return (
-        <UserPhotos
-          {...this.props}
-          // addPhoto={this.addPhoto}
-          // removePhoto={this.removePhoto}
-          unMount={this.toggleView}
-        />
-      );
+      return <UserPhotos {...this.props} unMount={this.toggleView} />;
     }
     return (
       <div className="App">
