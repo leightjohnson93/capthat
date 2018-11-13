@@ -1,10 +1,7 @@
 import React, { Component, Fragment } from "react";
 import { Link } from "react-router-dom";
-import Login from "./Login";
 import UserPhotos from "./UserPhotos";
 import EditProfile from "./EditProfile";
-import firebase from "firebase/app";
-import base, { firebaseApp } from "../base";
 import "../css/Profile.css";
 
 class Profile extends Component {

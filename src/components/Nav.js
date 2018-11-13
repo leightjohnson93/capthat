@@ -1,7 +1,5 @@
-import React, { Component, Fragment } from "react";
-import { Link, Route } from "react-router-dom";
-import Profile from "./Profile";
-import App from "./App";
+import React, { Component } from "react";
+import { Link } from "react-router-dom";
 
 class Nav extends Component {
   render() {
